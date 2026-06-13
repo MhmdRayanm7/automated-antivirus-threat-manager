@@ -100,3 +100,44 @@ class RansomwareVirus(Threat):
         out: signature
         """
         return f"RANSOM-{self._filename}-{self._file_size_kb}"
+    
+class SpywareVirus(Threat):
+    """
+    Spyware threat.
+    in: filename, file_size_kb, base_danger_score, data_target, network_access
+    out: SpywareVirus object
+    """
+
+    def __init__(self, filename, file_size_kb, base_danger_score, data_target, network_access):
+        """
+        in: filename, file_size_kb, base_danger_score, data_target, network_access
+        out: None
+        """
+        super().__init__(filename, file_size_kb, base_danger_score)
+        self.data_target = data_target
+        self.network_access = network_access
+
+    def assess_risk_level(self):
+        """
+        in: None
+        out: risk level
+        """
+        risk = self.danger_score
+        target = self.data_target.lower()
+
+        if self.network_access:
+            risk = risk * 1.7
+
+        if "password" in target or "credential" in target or "bank" in target:
+            risk = risk * 2
+        elif "cookie" in target or "browser" in target:
+            risk = risk * 1.5
+
+        return risk
+
+    def generate_signature(self):
+        """
+        in: None
+        out: signature
+        """
+        return f"SPY-{self._filename}-{self.data_target}"
