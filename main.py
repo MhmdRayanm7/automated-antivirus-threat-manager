@@ -1,3 +1,5 @@
+import matplotlib.pyplot as plt
+
 from security_threats import RansomwareVirus, SpywareVirus
 from scanning_engine import ScanningEngine, SystemCompromisedError
 
@@ -15,6 +17,60 @@ def create_sample_threats():
     ]
 
     return threats
+
+
+def show_threat_chart(threats):
+    """
+    in: threats
+    out: None
+    """
+    plt.figure(figsize=(10, 5))
+
+    plt.subplot(1, 2, 1)
+
+    used_labels = []
+
+    for threat in threats:
+        risk = threat.assess_risk_level()
+
+        if isinstance(threat, RansomwareVirus):
+            label = "Ransomware"
+            marker = "x"
+        else:
+            label = "Spyware"
+            marker = "^"
+
+        if label not in used_labels:
+            plt.scatter(threat.file_size_kb, risk, marker=marker, label=label)
+            used_labels.append(label)
+        else:
+            plt.scatter(threat.file_size_kb, risk, marker=marker)
+
+    plt.title("Threat Risk by File Size")
+    plt.xlabel("File Size KB")
+    plt.ylabel("Risk Score")
+    plt.grid(True)
+    plt.legend()
+
+    plt.subplot(1, 2, 2)
+
+    ransomware_count = 0
+    spyware_count = 0
+
+    for threat in threats:
+        if isinstance(threat, RansomwareVirus):
+            ransomware_count += 1
+        elif isinstance(threat, SpywareVirus):
+            spyware_count += 1
+
+    plt.bar(["Ransomware", "Spyware"], [ransomware_count, spyware_count], color=["red", "blue"])
+    plt.title("Threat Types")
+    plt.xlabel("Malware Family")
+    plt.ylabel("Count")
+
+    plt.tight_layout()
+    plt.savefig("threat_report.png")
+    plt.show()
 
 
 def run_scan():
@@ -40,6 +96,8 @@ def run_scan():
     print("Generated signatures:")
     for signature in engine.signatures:
         print(signature)
+
+    show_threat_chart(threats)
 
 
 if __name__ == "__main__":

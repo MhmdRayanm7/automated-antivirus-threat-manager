@@ -39,6 +39,22 @@ class Threat(abc.ABC):
 
         self.__danger_score = int(value)
 
+    @property
+    def filename(self):
+        """
+        in: None
+        out: filename
+        """
+        return self._filename
+
+    @property
+    def file_size_kb(self):
+        """
+        in: None
+        out: file size
+        """
+        return self._file_size_kb
+
     @abc.abstractmethod
     def assess_risk_level(self):
         """
@@ -100,7 +116,7 @@ class RansomwareVirus(Threat):
         out: signature
         """
         return f"RANSOM-{self._filename}-{self._file_size_kb}"
-    
+
 class SpywareVirus(Threat):
     """
     Spyware threat.
