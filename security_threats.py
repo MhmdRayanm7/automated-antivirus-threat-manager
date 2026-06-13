@@ -61,3 +61,42 @@ class Threat(abc.ABC):
         out: threat information
         """
         return f"{datetime.now()} | {self._filename} | {self.danger_score}"
+
+
+class RansomwareVirus(Threat):
+    """
+    Ransomware threat.
+    in: filename, file_size_kb, base_danger_score, target_directory
+    out: RansomwareVirus object
+    """
+
+    def __init__(self, filename, file_size_kb, base_danger_score, target_directory):
+        """
+        in: filename, file_size_kb, base_danger_score, target_directory
+        out: None
+        """
+        super().__init__(filename, file_size_kb, base_danger_score)
+        self.target_directory = target_directory
+
+    def assess_risk_level(self):
+        """
+        in: None
+        out: risk level
+        """
+        risk = self.danger_score
+
+        if "system32" in self.target_directory.lower():
+            risk = risk * 2.5
+        elif "windows" in self.target_directory.lower():
+            risk = risk * 2
+        elif "system" in self.target_directory.lower():
+            risk = risk * 1.5
+
+        return risk
+
+    def generate_signature(self):
+        """
+        in: None
+        out: signature
+        """
+        return f"RANSOM-{self._filename}-{self._file_size_kb}"
