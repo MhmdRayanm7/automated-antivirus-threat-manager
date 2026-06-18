@@ -9,63 +9,73 @@ def create_sample_threats():
     in: None
     out: list of threats
     """
-    threats = [
+    return [
         RansomwareVirus("locker.exe", 500, 40, "C:/Windows/System32"),
         RansomwareVirus("photo_encryptor.exe", 250, 25, "C:/Users/Pictures"),
         SpywareVirus("keylogger.exe", 300, 50, "passwords", True),
         SpywareVirus("cookie_reader.exe", 150, 30, "browser cookies", True)
     ]
 
-    return threats
 
-
-def show_threat_chart(threats):
+def print_scan_summary(engine):
     """
-    in: threats
+    in: engine
+    out: None
+    """
+    print("Generated signatures:")
+
+    for signature in engine.signatures:
+        print(f"- {signature}")
+
+    print("\nScan details:")
+
+    for result in engine.scan_results:
+        print(
+            f"- {result['type']} | "
+            f"{result['filename']} | "
+            f"{result['file_size_kb']} KB | "
+            f"risk={result['risk']}"
+        )
+
+
+def show_threat_chart(scan_results):
+    """
+    in: scan_results
     out: None
     """
     plt.figure(figsize=(10, 5))
 
     plt.subplot(1, 2, 1)
 
-    used_labels = []
+    for result in scan_results:
+        marker = "x"
 
-    for threat in threats:
-        risk = threat.assess_risk_level()
-
-        if isinstance(threat, RansomwareVirus):
-            label = "Ransomware"
-            marker = "x"
-        else:
-            label = "Spyware"
+        if result["type"] == "SpywareVirus":
             marker = "^"
 
-        if label not in used_labels:
-            plt.scatter(threat.file_size_kb, risk, marker=marker, label=label)
-            used_labels.append(label)
-        else:
-            plt.scatter(threat.file_size_kb, risk, marker=marker)
+        plt.scatter(
+            result["file_size_kb"],
+            result["risk"],
+            marker=marker,
+            label=result["type"]
+        )
 
-    plt.title("Threat Risk by File Size")
+    plt.title("Risk by File Size")
     plt.xlabel("File Size KB")
     plt.ylabel("Risk Score")
     plt.grid(True)
-    plt.legend()
 
     plt.subplot(1, 2, 2)
 
-    ransomware_count = 0
-    spyware_count = 0
+    type_counts = {}
 
-    for threat in threats:
-        if isinstance(threat, RansomwareVirus):
-            ransomware_count += 1
-        elif isinstance(threat, SpywareVirus):
-            spyware_count += 1
+    for result in scan_results:
+        threat_type = result["type"]
+        type_counts[threat_type] = type_counts.get(threat_type, 0) + 1
 
-    plt.bar(["Ransomware", "Spyware"], [ransomware_count, spyware_count], color=["red", "blue"])
-    plt.title("Threat Types")
-    plt.xlabel("Malware Family")
+    plt.bar(type_counts.keys(), type_counts.values())
+    plt.title("Threat Type Count")
+    plt.xlabel("Threat Type")
     plt.ylabel("Count")
 
     plt.tight_layout()
@@ -78,7 +88,7 @@ def run_scan():
     in: None
     out: None
     """
-    engine = ScanningEngine(500)
+    engine = ScanningEngine(risk_limit=500)
     threats = create_sample_threats()
 
     for threat in threats:
@@ -87,17 +97,15 @@ def run_scan():
     try:
         total_risk = engine.scan()
         print("Scan finished successfully.")
-        print(f"Total risk: {total_risk}")
+        print(f"Total risk: {total_risk}\n")
 
     except SystemCompromisedError as error:
         print("Critical scan warning.")
         print(error)
+        print()
 
-    print("Generated signatures:")
-    for signature in engine.signatures:
-        print(signature)
-
-    show_threat_chart(threats)
+    print_scan_summary(engine)
+    show_threat_chart(engine.scan_results)
 
 
 if __name__ == "__main__":
