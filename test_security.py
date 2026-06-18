@@ -34,6 +34,14 @@ class TestThreatClasses(unittest.TestCase):
         with self.assertRaises(ValueError):
             threat.danger_score = 150
 
+    def test_invalid_init_danger_score_raises_value_error(self):
+        """
+        in: None
+        out: None
+        """
+        with self.assertRaises(ValueError):
+            RansomwareVirus("locker.exe", 500, 150, "C:/Windows/System32")
+
     def test_empty_filename_raises_value_error(self):
         """
         in: None

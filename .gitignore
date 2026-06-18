@@ -2,5 +2,7 @@
 __pycache__/
 *.pyc
 .idea/
+.vscode/
+.env
 backup_report.txt
-*.png
+threat_report.png
