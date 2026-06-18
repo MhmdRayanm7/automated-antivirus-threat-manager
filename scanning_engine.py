@@ -1,10 +1,12 @@
+from pathlib import Path
+
 from security_threats import Threat
 
 
 class SystemCompromisedError(Exception):
     """
-    System security error.
-    in: error message
+    Custom error for critical system risk.
+    in: message
     out: exception object
     """
 
@@ -14,21 +16,27 @@ class SystemCompromisedError(Exception):
 class ScanningEngine:
     """
     Antivirus scanning engine.
-    in: risk_limit
-    out: ScanningEngine object
+    in: risk_limit, report_file
+    out: scanning engine object
     """
 
-    def __init__(self, risk_limit=250):
+    def __init__(self, risk_limit: float = 250, report_file: str = "backup_report.txt"):
         """
-        in: risk_limit
+        in: risk_limit, report_file
         out: None
         """
-        self.risk_limit = risk_limit
+        if risk_limit <= 0:
+            raise ValueError("Risk limit must be greater than zero.")
+
+        self.risk_limit = float(risk_limit)
+        self.report_file = Path(report_file)
+
         self.threats = []
         self.signatures = []
-        self.total_risk = 0
+        self.scan_results = []
+        self.total_risk = 0.0
 
-    def add_threat(self, threat):
+    def add_threat(self, threat: Threat):
         """
         in: threat
         out: None
@@ -38,13 +46,14 @@ class ScanningEngine:
 
         self.threats.append(threat)
 
-    def scan(self):
+    def scan(self) -> float:
         """
         in: None
         out: total risk
         """
-        self.total_risk = 0
+        self.total_risk = 0.0
         self.signatures = []
+        self.scan_results = []
 
         try:
             for threat in self.threats:
@@ -53,6 +62,15 @@ class ScanningEngine:
 
                 self.total_risk += risk
                 self.signatures.append(signature)
+
+                # Save clean scan data for reports and charts.
+                self.scan_results.append({
+                    "type": threat.__class__.__name__,
+                    "filename": threat.filename,
+                    "file_size_kb": threat.file_size_kb,
+                    "risk": risk,
+                    "signature": signature
+                })
 
             if self.total_risk > self.risk_limit:
                 raise SystemCompromisedError("System risk limit passed.")
@@ -71,10 +89,13 @@ class ScanningEngine:
         in: None
         out: None
         """
-        with open("backup_report.txt", "w") as file:
+        with self.report_file.open("w", encoding="utf-8") as file:
             file.write("Backup Threat Report\n")
+            file.write("====================\n")
+            file.write(f"Risk limit: {self.risk_limit}\n")
             file.write(f"Total threats: {len(self.threats)}\n")
-            file.write(f"Total risk: {self.total_risk}\n")
+            file.write(f"Total risk: {self.total_risk}\n\n")
 
+            file.write("Threat signatures:\n")
             for signature in self.signatures:
-                file.write(f"{signature}\n")
+                file.write(f"- {signature}\n")
