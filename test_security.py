@@ -1,7 +1,9 @@
+import tempfile
 import unittest
+from pathlib import Path
 
-from security_threats import RansomwareVirus, SpywareVirus
 from scanning_engine import ScanningEngine, SystemCompromisedError
+from security_threats import RansomwareVirus, SpywareVirus
 
 
 class TestThreatClasses(unittest.TestCase):
@@ -11,7 +13,7 @@ class TestThreatClasses(unittest.TestCase):
     out: test results
     """
 
-    def test_danger_score_valid_update(self):
+    def test_valid_danger_score_update(self):
         """
         in: None
         out: None
@@ -22,7 +24,7 @@ class TestThreatClasses(unittest.TestCase):
 
         self.assertEqual(threat.danger_score, 60)
 
-    def test_danger_score_out_of_range_raises_value_error(self):
+    def test_invalid_danger_score_raises_value_error(self):
         """
         in: None
         out: None
@@ -32,18 +34,27 @@ class TestThreatClasses(unittest.TestCase):
         with self.assertRaises(ValueError):
             threat.danger_score = 150
 
-    def test_private_danger_score_cannot_be_changed_directly(self):
+    def test_empty_filename_raises_value_error(self):
+        """
+        in: None
+        out: None
+        """
+        with self.assertRaises(ValueError):
+            RansomwareVirus("", 500, 40, "C:/Windows/System32")
+
+    def test_private_danger_score_is_protected(self):
         """
         in: None
         out: None
         """
         threat = RansomwareVirus("locker.exe", 500, 40, "C:/Windows/System32")
 
+        # This creates a new outside attribute, but does not change the private score.
         threat.__danger_score = 99
 
         self.assertEqual(threat.danger_score, 40)
 
-    def test_ransomware_risk_for_system32(self):
+    def test_ransomware_system32_risk(self):
         """
         in: None
         out: None
@@ -52,9 +63,9 @@ class TestThreatClasses(unittest.TestCase):
 
         risk = threat.assess_risk_level()
 
-        self.assertEqual(risk, 100)
+        self.assertAlmostEqual(risk, 100.0)
 
-    def test_spyware_risk_with_passwords_and_network(self):
+    def test_spyware_password_network_risk(self):
         """
         in: None
         out: None
@@ -63,7 +74,7 @@ class TestThreatClasses(unittest.TestCase):
 
         risk = threat.assess_risk_level()
 
-        self.assertAlmostEqual(risk, 170)
+        self.assertAlmostEqual(risk, 170.0)
 
 
 class TestScanningEngine(unittest.TestCase):
@@ -78,26 +89,47 @@ class TestScanningEngine(unittest.TestCase):
         in: None
         out: None
         """
-        engine = ScanningEngine(500)
+        with tempfile.TemporaryDirectory() as temp_dir:
+            report_path = Path(temp_dir) / "test_report.txt"
+            engine = ScanningEngine(500, report_path)
 
-        engine.add_threat(RansomwareVirus("locker.exe", 500, 40, "C:/Windows/System32"))
-        engine.add_threat(SpywareVirus("keylogger.exe", 300, 50, "passwords", True))
+            engine.add_threat(RansomwareVirus("locker.exe", 500, 40, "C:/Windows/System32"))
+            engine.add_threat(SpywareVirus("keylogger.exe", 300, 50, "passwords", True))
 
-        total_risk = engine.scan()
+            total_risk = engine.scan()
 
-        self.assertAlmostEqual(total_risk, 270)
+            self.assertAlmostEqual(total_risk, 270.0)
+            self.assertEqual(len(engine.signatures), 2)
+            self.assertEqual(len(engine.scan_results), 2)
 
     def test_engine_raises_system_compromised_error(self):
         """
         in: None
         out: None
         """
-        engine = ScanningEngine(100)
+        with tempfile.TemporaryDirectory() as temp_dir:
+            report_path = Path(temp_dir) / "test_report.txt"
+            engine = ScanningEngine(100, report_path)
 
-        engine.add_threat(SpywareVirus("keylogger.exe", 300, 50, "passwords", True))
+            engine.add_threat(SpywareVirus("keylogger.exe", 300, 50, "passwords", True))
 
-        with self.assertRaises(SystemCompromisedError):
+            with self.assertRaises(SystemCompromisedError):
+                engine.scan()
+
+    def test_engine_writes_backup_report(self):
+        """
+        in: None
+        out: None
+        """
+        with tempfile.TemporaryDirectory() as temp_dir:
+            report_path = Path(temp_dir) / "test_report.txt"
+            engine = ScanningEngine(500, report_path)
+
+            engine.add_threat(RansomwareVirus("locker.exe", 500, 40, "C:/Windows/System32"))
             engine.scan()
+
+            self.assertTrue(report_path.exists())
+            self.assertIn("Backup Threat Report", report_path.read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":
