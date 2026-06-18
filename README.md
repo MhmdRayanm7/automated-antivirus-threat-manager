@@ -1,114 +1,78 @@
 # Automated Antivirus & System Threat Manager
 
-A Python object-oriented programming project that simulates a simple antivirus scanning engine and system threat manager.
+A simple Python project that simulates an antivirus threat scanner.
 
-The project creates malware threat objects, calculates their risk levels, scans them with an antivirus engine, handles high-risk system warnings, writes a backup report, runs unit tests, and displays threat analytics using charts.
-
-## Project Objective
-
-The goal of this project is to practice:
-
-* Object-oriented programming
-* Abstract classes
-* Inheritance
-* Polymorphism
-* Encapsulation
-* Python properties
-* Custom exception handling
-* Unit testing
-* Basic data visualization
+The project uses object-oriented programming to create different virus types, scan them, calculate risk, write a backup report, run tests, and show basic charts.
 
 ## Features
 
-* Abstract base class using `abc.ABC`
-* Base threat class named `Threat`
-* Concrete threat classes:
+* Abstract base class
+* Ransomware and spyware classes
+* Encapsulation with private danger score
+* Risk calculation
+* Custom exception for high system risk
+* Backup report file
+* Unit tests
+* Simple threat charts with matplotlib
 
-  * `RansomwareVirus`
-  * `SpywareVirus`
-* Private danger score field using `__danger_score`
-* Controlled score access using `@property`
-* Input validation with `ValueError`
-* Custom exception named `SystemCompromisedError`
-* Scanning engine that calculates total system risk
-* Threat signature generation
-* Backup report generation
-* Unit tests using `unittest`
-* Threat charts using `matplotlib`
-
-## Project Structure
+## Project Files
 
 ```text
-automated-antivirus-threat-manager/
-│
-├── security_threats.py
-├── scanning_engine.py
-├── main.py
-├── test_security.py
-├── requirements.txt
-├── .gitignore
-└── README.md
+security_threats.py
+scanning_engine.py
+main.py
+test_security.py
+requirements.txt
+README.md
+.gitignore
 ```
 
-## File Descriptions
+## File Description
 
-### `security_threats.py`
+### security_threats.py
 
-This file contains the threat classes.
-
-Classes included:
+Contains the threat classes:
 
 * `Threat`
 * `RansomwareVirus`
 * `SpywareVirus`
 
-The `Threat` class is an abstract base class. It stores the shared data for all threats, such as the file name, file size, and danger score.
+This file handles the virus data, danger score, risk calculation, and threat signatures.
 
-The `RansomwareVirus` class represents a ransomware threat. It increases risk when the target directory is a sensitive system directory.
+### scanning_engine.py
 
-The `SpywareVirus` class represents a spyware threat. It increases risk when it targets sensitive data or has network access.
-
-### `scanning_engine.py`
-
-This file contains the antivirus scanning engine.
-
-Classes included:
+Contains:
 
 * `ScanningEngine`
 * `SystemCompromisedError`
 
-The scanning engine stores threats, scans them, calculates total risk, saves generated signatures, and writes a backup report.
+This file scans the threats, calculates total risk, saves signatures, and writes a backup report.
 
-If the total risk becomes higher than the allowed risk limit, the engine raises `SystemCompromisedError`.
+### main.py
 
-### `main.py`
+Runs the project.
 
-This file runs the project demo.
+It creates sample threats, scans them, prints the results, and shows charts.
 
-It creates sample threats, adds them to the scanning engine, runs the scan, prints the result, and displays charts.
+### test_security.py
 
-### `test_security.py`
+Contains unit tests for the project.
 
-This file contains unit tests for the system.
+The tests check danger score validation, private field protection, risk calculation, and custom exception handling.
 
-The tests check:
-
-* Valid danger score updates
-* Out-of-range danger score errors
-* Private danger score protection
-* Ransomware risk calculation
-* Spyware risk calculation
-* Scanning engine total risk
-* Custom exception behavior
-
-## How to Run
+## Install Requirements
 
 ```bash
 pip install -r requirements.txt
+```
+
+## Run the Project
+
+```bash
 python main.py
 ```
 
-## How to Run Tests
+## Run Tests
 
 ```bash
 python -m unittest test_security.py
@@ -122,11 +86,41 @@ OK
 
 ## Generated Files
 
-When the project runs, it can generate:
+The program may create these files:
 
 ```text
 backup_report.txt
 threat_report.png
 ```
 
-These files are output files and should be ignored by Git.
+These files are generated automatically and should not be uploaded to GitHub.
+
+## Git Ignore
+
+The `.gitignore` file should include:
+
+```gitignore
+.venv/
+__pycache__/
+*.pyc
+.idea/
+backup_report.txt
+threat_report.png
+```
+
+## Example Output
+
+```text
+Scan finished successfully.
+Total risk: 371.5
+
+Generated signatures:
+- RANSOM-locker.exe-500
+- RANSOM-photo_encryptor.exe-250
+- SPY-keylogger.exe-passwords
+- SPY-cookie_reader.exe-browser cookies
+```
+
+## Project Goal
+
+The goal of this project is to practice Python OOP, inheritance, encapsulation, exceptions, unit testing, and simple visualization.
