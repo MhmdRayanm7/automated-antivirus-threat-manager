@@ -1,126 +1,77 @@
+
 # Automated Antivirus & System Threat Manager
 
-A simple Python project that simulates an antivirus threat scanner.
+![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)
+![Matplotlib](https://img.shields.io/badge/Matplotlib-11557C)
+![OOP](https://img.shields.io/badge/OOP-Programming-blue)
+![Testing](https://img.shields.io/badge/Testing-unittest-2EA44F)
 
-The project uses object-oriented programming to create different virus types, scan them, calculate risk, write a backup report, run tests, and show basic charts.
+The application simulates an antivirus scanning system that models security threats, calculates risk levels, generates reports, and visualizes scan results.
 
 ## Features
 
-* Abstract base class
-* Ransomware and spyware classes
-* Encapsulation with private danger score
-* Risk calculation
-* Custom exception for high system risk
-* Backup report file
-* Unit tests
-* Simple threat charts with matplotlib
+- Abstract threat base class
+- Ransomware and spyware threat models
+- Threat-specific risk calculations
+- Danger score validation and encapsulation
+- Simulated threat signature generation
+- Configurable system risk threshold
+- Custom exception handling
+- Automatic backup report generation
+- Risk and threat visualization using Matplotlib
+- Unit testing
 
-## Project Files
+## Concepts Practiced
 
-```text
-security_threats.py
-scanning_engine.py
-main.py
-test_security.py
-requirements.txt
-README.md
-.gitignore
-```
+- Object-oriented programming (OOP)
+- Abstraction and abstract classes
+- Inheritance and polymorphism
+- Encapsulation and properties
+- Input validation
+- Exception handling
+- File handling
+- Data visualization
+- Unit testing
 
-## File Description
+## Project Structure
 
-### security_threats.py
+| File | Purpose |
+| --- | --- |
+| security_threats.py | Threat models and risk calculations |
+| scanning_engine.py | Scan simulation and report generation |
+| main.py | Application entry point and visualization |
+| test_security.py | Unit tests |
+| requirements.txt | Project dependencies |
 
-Contains the threat classes:
+## Getting Started
 
-* `Threat`
-* `RansomwareVirus`
-* `SpywareVirus`
-
-This file handles the virus data, danger score, risk calculation, and threat signatures.
-
-### scanning_engine.py
-
-Contains:
-
-* `ScanningEngine`
-* `SystemCompromisedError`
-
-This file scans the threats, calculates total risk, saves signatures, and writes a backup report.
-
-### main.py
-
-Runs the project.
-
-It creates sample threats, scans them, prints the results, and shows charts.
-
-### test_security.py
-
-Contains unit tests for the project.
-
-The tests check danger score validation, private field protection, risk calculation, and custom exception handling.
-
-## Install Requirements
+Install dependencies:
 
 ```bash
-pip install -r requirements.txt
+python3 -m pip install -r requirements.txt
 ```
 
-## Run the Project
+Run the application:
 
 ```bash
-python main.py
+python3 main.py
 ```
 
-## Run Tests
+## Testing
 
 ```bash
-python -m unittest test_security.py
+python3 -m unittest test_security.py
 ```
 
-Expected result:
+## Generated Reports
 
-```text
-OK
-```
+- `backup_report.txt` — Threat assessment report
+- `threat_report.png` — Risk and threat visualization
 
-## Generated Files
+## Notes
 
-The program may create these files:
+This project is an educational simulation of antivirus risk assessment. It does not detect, execute, or remove real malware.
 
-```text
-backup_report.txt
-threat_report.png
-```
+---
 
-These files are generated automatically and should not be uploaded to GitHub.
-
-## Git Ignore
-
-The `.gitignore` file should include:
-
-```gitignore
-.venv/
-__pycache__/
-*.pyc
-.idea/
-backup_report.txt
-threat_report.png
-```
-
-## Example Output
-
-```text
-Scan finished successfully.
-Total risk: 371.5
-
-Generated signatures:
-- RANSOM-locker.exe-500
-- RANSOM-photo_encryptor.exe-250
-- SPY-keylogger.exe-passwords
-- SPY-cookie_reader.exe-browser cookies
-```
-
-## Project Goal
-
-The goal of this project is to practice Python OOP, inheritance, encapsulation, exceptions, unit testing, and simple visualization.
+Developed as part of my college Python OOP studies.
